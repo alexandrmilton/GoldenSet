@@ -10,7 +10,7 @@
 
 import '@/global.css';
 
-import { Platform } from 'react-native';
+import type { TextStyle } from 'react-native';
 
 export const Colors = {
   /** Surfaces, darkest to lightest */
@@ -68,18 +68,34 @@ export const Radius = {
   pill: 999,
 } as const;
 
-export const Fonts = Platform.select({
-  ios: { sans: 'system-ui', rounded: 'ui-rounded', mono: 'ui-monospace' },
-  default: { sans: 'normal', rounded: 'normal', mono: 'monospace' },
-  web: { sans: 'var(--font-display)', rounded: 'var(--font-rounded)', mono: 'var(--font-mono)' },
-});
-
-export const Type = {
-  display: { fontSize: 34, fontWeight: '700', letterSpacing: -0.5 },
-  title: { fontSize: 24, fontWeight: '700', letterSpacing: -0.3 },
-  heading: { fontSize: 18, fontWeight: '600' },
-  body: { fontSize: 16, fontWeight: '400' },
-  caption: { fontSize: 13, fontWeight: '400' },
-  /** Rating figures — tabular so the column never jitters */
-  numeric: { fontSize: 22, fontWeight: '700', fontVariant: ['tabular-nums'] },
+export const FontFamily = {
+  regular: 'InterTight_400Regular',
+  medium: 'InterTight_500Medium',
+  semibold: 'InterTight_600SemiBold',
+  bold: 'InterTight_700Bold',
 } as const;
+
+/**
+ * Type scale. Weight comes from the font family, not `fontWeight` — with a
+ * custom font, `fontWeight` is silently ignored on Android.
+ */
+export const Type = {
+  display: { fontFamily: FontFamily.bold, fontSize: 34, letterSpacing: -0.6 },
+  title: { fontFamily: FontFamily.bold, fontSize: 24, letterSpacing: -0.4 },
+  heading: { fontFamily: FontFamily.semibold, fontSize: 18, letterSpacing: -0.2 },
+  body: { fontFamily: FontFamily.regular, fontSize: 16 },
+  bodyStrong: { fontFamily: FontFamily.semibold, fontSize: 16 },
+  caption: { fontFamily: FontFamily.regular, fontSize: 13 },
+  label: { fontFamily: FontFamily.medium, fontSize: 12, letterSpacing: 0.2 },
+  /** Rating figures — tabular so the column never jitters as numbers change */
+  numeric: {
+    fontFamily: FontFamily.bold,
+    fontSize: 22,
+    fontVariant: ['tabular-nums'],
+  },
+  numericSmall: {
+    fontFamily: FontFamily.semibold,
+    fontSize: 14,
+    fontVariant: ['tabular-nums'],
+  },
+} satisfies Record<string, TextStyle>;
