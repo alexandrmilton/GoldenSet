@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Expo generates this file locally on `expo start`; it is git-ignored,
+      # so CI has to create it before TypeScript can resolve Expo's ambient types.
+      - name: Generate Expo type reference
+        run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
+
+      - run: npm run lint
+      - run: npm run typecheck

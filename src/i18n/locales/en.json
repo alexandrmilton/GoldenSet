@@ -1,0 +1,36 @@
+{
+  "common": {
+    "appName": "Golden Set",
+    "tagline": "Play. Compete. Climb."
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "messages": "Messages",
+    "menu": "Menu"
+  },
+  "rating": {
+    "title": "Player rating",
+    "tab": "Rating",
+    "allRegions": "All regions",
+    "points": "points",
+    "unranked": "New player",
+    "matchesToRank_one": "{{count}} match left to get ranked",
+    "matchesToRank_other": "{{count}} matches left to get ranked"
+  },
+  "tournaments": {
+    "tab": "Tournaments",
+    "next": "Next tournament"
+  },
+  "calendar": {
+    "tab": "Calendar"
+  },
+  "profile": {
+    "tab": "Profile"
+  },
+  "setup": {
+    "phaseZero": "Foundation is ready",
+    "nextStep": "Next: design system from the reference screen",
+    "language": "Language: {{lang}}"
+  }
+}

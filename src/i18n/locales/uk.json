@@ -1,0 +1,37 @@
+{
+  "common": {
+    "appName": "Golden Set",
+    "tagline": "Грай. Змагайся. Піднімайся."
+  },
+  "nav": {
+    "home": "Головна",
+    "search": "Пошук",
+    "messages": "Повідомлення",
+    "menu": "Меню"
+  },
+  "rating": {
+    "title": "Рейтинг гравців",
+    "tab": "Рейтинг",
+    "allRegions": "Всі регіони",
+    "points": "балів",
+    "unranked": "Новий гравець",
+    "matchesToRank_one": "Залишився {{count}} матч до рейтингу",
+    "matchesToRank_few": "Залишилось {{count}} матчі до рейтингу",
+    "matchesToRank_many": "Залишилось {{count}} матчів до рейтингу"
+  },
+  "tournaments": {
+    "tab": "Турніри",
+    "next": "Наступний турнір"
+  },
+  "calendar": {
+    "tab": "Календар"
+  },
+  "profile": {
+    "tab": "Профіль"
+  },
+  "setup": {
+    "phaseZero": "Фундамент готовий",
+    "nextStep": "Далі: дизайн-система з референсного екрана",
+    "language": "Мова: {{lang}}"
+  }
+}
