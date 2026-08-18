@@ -8,9 +8,13 @@ it records not just what we do, but why.** This file is the short version.
 
 ## Expo has changed
 
-Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing any code.
-This project is Expo SDK 57 / React Native 0.86 / React 19.2. Do not copy patterns from older
-tutorials.
+Read the exact versioned docs at https://docs.expo.dev/versions/v54.0.0/ before writing any code.
+This project is Expo SDK 54 / React Native 0.81 / React 19.1. Do not copy patterns from other SDK
+versions in either direction.
+
+**Why SDK 54 and not the latest:** Expo Go on the App Store is pinned to SDK 54, and a newer SDK
+would mean either a paid Apple Developer account or no iPhone testing at all. Do not bump the SDK
+without deciding that question first — see `docs/PLAN.md` §14.
 
 ## Stack
 
