@@ -227,7 +227,7 @@ delta_a    = round(K * margin * (result_a - expected_a))
 
 | Фаза | Що робимо | Готовий результат | ~Час |
 |---|---|---|---|
-| ~~**0. Фундамент**~~ ✅ (18.08.2026 — лишилось: репо на GitHub, проєкт Supabase) | git init + приватний репо на GitHub, `create-expo-app` (TS), Expo Router, ESLint/Prettier, папка `docs/`, `CLAUDE.md`, GitHub Actions (lint+typecheck), i18next + `locales/en.json`&`uk.json`, проєкт Supabase | «Hello» відкривається на твоєму iPhone через Expo Go | 1 вечір |
+| ~~**0. Фундамент**~~ ✅ (18.08.2026 — лишилось: проєкт Supabase) | git init + приватний репо на GitHub, `create-expo-app` (TS), Expo Router, ESLint/Prettier, папка `docs/`, `CLAUDE.md`, GitHub Actions (lint+typecheck), i18next + `locales/en.json`&`uk.json`, проєкт Supabase | «Hello» відкривається на твоєму iPhone через Expo Go | 1 вечір |
 | **1. Дизайн-система** | токени, шрифти, іконки, `Button/Card/Avatar/SegmentedControl/NtrpBadge/ListRow/Sheet`, темна тема, splash + іконка з фото | екран-«вітрина» всіх компонентів | 3–4 дні |
 | **2. Головний екран статикою** | верстка екрана 1:1 з референсу на мок-даних, нижнє меню, навігація між 5 табами | додаток «виглядає як фото», але без бекенду | 3–4 дні |
 | **3. Auth + профіль** | Supabase Auth (Apple/Google/email), таблиця `profiles` + RLS, Storage для аватарів, онбординг, калібратор NTRP | реальний вхід і свій профіль | 1 тиждень |
