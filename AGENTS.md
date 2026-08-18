@@ -28,24 +28,30 @@ tutorials.
 1. **No hardcoded colours or spacing.** Everything comes from `src/theme/tokens.ts`.
    The palette is derived from the design reference at `docs/reference/design-reference-home.jpg` —
    dark clay theme, gold as the brand colour.
-2. **No literal user-facing strings in JSX.** Always `t('key')`, with the key added to both
+2. **Type comes from `Type`/`FontFamily` in tokens, never `fontWeight`.** The app ships
+   Inter Tight as a custom font; with a custom font Android silently ignores `fontWeight`, so a
+   "bold" style set that way renders regular on half the devices.
+3. **No literal user-facing strings in JSX.** Always `t('key')`, with the key added to both
    `src/i18n/locales/en.json` and `uk.json`. ESLint enforces this and will fail the build.
    Ukrainian needs 3 plural forms (`_one/_few/_many`), English 2 — use i18next plurals, never
    manual string concatenation.
-3. **Rating points are written by the server only.** Never from the client. The Elo maths lives in
+4. **Rating points are written by the server only.** Never from the client. The Elo maths lives in
    one Edge Function and is unit-tested. See `docs/PLAN.md` §5.
-4. **Secrets.** Only `EXPO_PUBLIC_*` keys may reach the app bundle (RLS protects them).
+5. **Secrets.** Only `EXPO_PUBLIC_*` keys may reach the app bundle (RLS protects them).
    `SUPABASE_SERVICE_ROLE_KEY` belongs in Edge Function / GitHub secrets and nowhere else.
    `.env` is git-ignored; keep `.env.example` in sync when adding a variable.
-5. **Database changes go through migrations** (`supabase/migrations/`), never by hand in the
+6. **Database changes go through migrations** (`supabase/migrations/`), never by hand in the
    dashboard — otherwise local and production drift apart.
-6. **Row Level Security on every table, from the first migration.**
+7. **Row Level Security on every table, from the first migration.**
 
 ## Layout
 
 ```
 src/app/        screens (Expo Router)
 src/theme/      design tokens — the single source of truth for styling
+src/components/ui/  the design system: Text, Button, Card, Avatar, NtrpBadge,
+                SegmentedControl, ListRow, Sheet — build screens from these
+src/lib/        supabase client
 src/i18n/       i18next setup + locales/en.json, locales/uk.json
 docs/PLAN.md    the plan: stack, data model, rating maths, phases, branding
 docs/reference/ design reference images
@@ -61,5 +67,6 @@ npm run typecheck  # tsc --noEmit
 
 ## Where we are
 
-Phase 0 (foundation) complete. Next: Phase 1 — build the design system from the reference
-screen, before writing any real screens. See `docs/PLAN.md` §7 for the phase list.
+Phases 0 (foundation) and 1 (design system) complete. Next: Phase 2 — build the real home
+screen 1:1 with `docs/reference/design-reference-home.jpg` out of the existing UI components.
+See `docs/PLAN.md` §7 for the phase list.

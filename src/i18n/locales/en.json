@@ -32,5 +32,25 @@
     "phaseZero": "Foundation is ready",
     "nextStep": "Next: design system from the reference screen",
     "language": "Language: {{lang}}"
+  },
+  "showcase": {
+    "title": "Design system",
+    "subtitle": "Every screen is built from these parts",
+    "typography": "Typography",
+    "buttons": "Buttons",
+    "primary": "Create a game",
+    "secondary": "Log a match",
+    "ghost": "Cancel",
+    "loading": "Saving",
+    "levelBadge": "Level badge",
+    "selfDeclared": "Self-declared",
+    "verified": "Verified",
+    "utrScale": "UTR scale",
+    "segmented": "Segmented control",
+    "ratingList": "Rating list",
+    "sheet": "Bottom sheet",
+    "openSheet": "Open sheet",
+    "sheetTitle": "What are we doing?",
+    "palette": "Palette"
   }
 }
