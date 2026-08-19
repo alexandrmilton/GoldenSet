@@ -52,5 +52,9 @@
     "openSheet": "Open sheet",
     "sheetTitle": "What are we doing?",
     "palette": "Palette"
+  },
+  "home": {
+    "compose": "Create",
+    "seeAll": "See all"
   }
 }
