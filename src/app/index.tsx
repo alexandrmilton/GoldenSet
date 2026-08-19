@@ -1,35 +1,26 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import {
-  Avatar,
-  Button,
-  Card,
-  ListRow,
-  NtrpBadge,
-  SegmentedControl,
-  Sheet,
-  Text,
-  type SegmentedOption,
-} from '@/components/ui';
-import { Colors, Radius, Spacing } from '@/theme/tokens';
+import { BottomNav, type NavKey } from '@/components/home/bottom-nav';
+import { Hero } from '@/components/home/hero';
+import { TournamentBanner } from '@/components/home/tournament-banner';
+import { Button, Card, ListRow, SegmentedControl, Sheet, Text, type SegmentedOption } from '@/components/ui';
+import { MOCK_PLAYERS, MOCK_TOURNAMENT, MOCK_VIEWER } from '@/features/home/mock';
+import { Colors, Spacing } from '@/theme/tokens';
 
 type Section = 'rating' | 'tournaments' | 'calendar' | 'profile';
 
-/** Placeholder figure from the design reference. */
-const SAMPLE_POINTS = '2487';
-
 /**
- * Component gallery — the deliverable of Phase 1. Every part the real screens
- * are made of, in one place, so we can judge the system before building with it.
- * Replaced by the real home screen in Phase 2.
+ * Home — built 1:1 against docs/reference/design-reference-home.jpg.
+ * Data is still mock (see features/home/mock.ts); Supabase arrives in Phase 4.
  */
-export default function ShowcaseScreen() {
+export default function HomeScreen() {
   const { t } = useTranslation();
   const [section, setSection] = useState<Section>('rating');
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [tab, setTab] = useState<NavKey>('home');
+  const [composeOpen, setComposeOpen] = useState(false);
 
   const sections: SegmentedOption<Section>[] = [
     { value: 'rating', label: t('rating.tab'), icon: 'trophy-outline' },
@@ -38,140 +29,102 @@ export default function ShowcaseScreen() {
     { value: 'profile', label: t('profile.tab'), icon: 'person-outline' },
   ];
 
+  const navLabels: Record<NavKey, string> = {
+    home: t('nav.home'),
+    search: t('nav.search'),
+    messages: t('nav.messages'),
+    menu: t('nav.menu'),
+  };
+
   return (
     <View style={styles.screen}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.header}>
-            <Text variant="display" tone="gold">
-              {t('common.appName')}
-            </Text>
-            <Text variant="caption" tone="secondary">
-              {t('showcase.subtitle')}
-            </Text>
-          </View>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={[]}>
+        <Hero
+          tagline={t('common.tagline')}
+          playerName={MOCK_VIEWER.name}
+          unreadCount={MOCK_VIEWER.unread}
+        />
 
-          <Block title={t('showcase.typography')}>
-            <Text variant="display">{t('showcase.title')}</Text>
-            <Text variant="title">{t('rating.title')}</Text>
-            <Text variant="heading">{t('tournaments.next')}</Text>
-            <Text variant="body" tone="secondary">
-              {t('common.tagline')}
-            </Text>
-            <Text variant="numeric" tone="gold">
-              {SAMPLE_POINTS}
-            </Text>
-          </Block>
+        <View style={styles.body}>
+          <SegmentedControl options={sections} value={section} onChange={setSection} />
 
-          <Block title={t('showcase.segmented')}>
-            <SegmentedControl options={sections} value={section} onChange={setSection} />
-          </Block>
-
-          <Block title={t('showcase.levelBadge')}>
-            <View style={styles.badgeRow}>
-              <Badge caption={t('showcase.selfDeclared')}>
-                <NtrpBadge value={4.5} size={56} />
-              </Badge>
-              <Badge caption={t('showcase.verified')}>
-                <NtrpBadge value={5} size={56} verified />
-              </Badge>
-              <Badge caption={t('showcase.utrScale')}>
-                <NtrpBadge value={9.5} scale="utr" size={56} />
-              </Badge>
+          <Card padded={false} style={styles.ratingCard}>
+            <View style={styles.ratingHeader}>
+              <Text variant="title">{t('rating.title')}</Text>
+              <Pressable accessibilityRole="button" style={styles.regionPicker}>
+                <Text variant="caption" tone="secondary">
+                  {t('rating.allRegions')}
+                </Text>
+                <Ionicons name="chevron-down" size={14} color={Colors.text.secondary} />
+              </Pressable>
             </View>
-          </Block>
 
-          <Block title={t('showcase.buttons')}>
-            <Button label={t('showcase.primary')} />
-            <Button label={t('showcase.secondary')} variant="secondary" />
-            <Button label={t('showcase.ghost')} variant="ghost" />
-            <Button label={t('showcase.loading')} loading />
-          </Block>
+            {MOCK_PLAYERS.map((player, index) => (
+              <View key={player.rank}>
+                {index > 0 ? <View style={styles.divider} /> : null}
+                <ListRow
+                  rank={player.rank}
+                  name={player.name}
+                  subtitle={player.city}
+                  points={player.points}
+                  delta={player.delta}
+                  highlighted={player.rank === 1}
+                />
+              </View>
+            ))}
+          </Card>
 
-          <Block title={t('showcase.ratingList')}>
-            <Card padded={false} style={styles.listCard}>
-              <ListRow rank={1} name="Max Volyn" subtitle="Київ" points={2487} delta={24} highlighted />
-              <View style={styles.divider} />
-              <ListRow rank={2} name="Olya Serve" subtitle="Львів" points={2341} delta={18} />
-              <View style={styles.divider} />
-              <ListRow rank={3} name="Dmytro Ace" subtitle="Харків" points={2278} delta={-15} />
-            </Card>
-          </Block>
+          <TournamentBanner
+            label={t('tournaments.next')}
+            name={MOCK_TOURNAMENT.name}
+            meta={MOCK_TOURNAMENT.meta}
+          />
+        </View>
+      </ScrollView>
 
-          <Block title={t('showcase.sheet')}>
-            <Button label={t('showcase.openSheet')} variant="secondary" onPress={() => setSheetOpen(true)} />
-          </Block>
+      <BottomNav
+        active={tab}
+        labels={navLabels}
+        composeLabel={t('home.compose')}
+        onSelect={setTab}
+        onCompose={() => setComposeOpen(true)}
+      />
 
-          <Block title={t('showcase.palette')}>
-            <View style={styles.swatches}>
-              {[
-                Colors.clay[500],
-                Colors.ball[500],
-                Colors.gold,
-                Colors.wimbledon,
-                Colors.usopen,
-                Colors.bg.surface,
-              ].map((color) => (
-                <View key={color} style={[styles.swatch, { backgroundColor: color }]} />
-              ))}
-            </View>
-          </Block>
-
-          <View style={styles.avatars}>
-            <Avatar name="Max Volyn" size={56} ring={Colors.gold} />
-            <Avatar name="Olya Serve" size={44} />
-            <Avatar name="Dmytro Ace" size={32} />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-
-      <Sheet visible={sheetOpen} title={t('showcase.sheetTitle')} onClose={() => setSheetOpen(false)}>
-        <Button label={t('showcase.primary')} onPress={() => setSheetOpen(false)} />
-        <Button label={t('showcase.secondary')} variant="secondary" onPress={() => setSheetOpen(false)} />
+      <Sheet
+        visible={composeOpen}
+        title={t('home.compose')}
+        onClose={() => setComposeOpen(false)}>
+        <Button label={t('showcase.primary')} onPress={() => setComposeOpen(false)} />
+        <Button
+          label={t('showcase.secondary')}
+          variant="secondary"
+          onPress={() => setComposeOpen(false)}
+        />
       </Sheet>
-    </View>
-  );
-}
-
-function Block({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <View style={styles.block}>
-      <Text variant="label" tone="tertiary" style={styles.blockTitle}>
-        {title.toUpperCase()}
-      </Text>
-      <View style={styles.blockBody}>{children}</View>
-    </View>
-  );
-}
-
-function Badge({ caption, children }: { caption: string; children: React.ReactNode }) {
-  return (
-    <View style={styles.badge}>
-      {children}
-      <Text variant="caption" tone="tertiary">
-        {caption}
-      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Colors.bg.base },
-  safeArea: { flex: 1 },
-  content: { padding: Spacing.lg, gap: Spacing.xxl, paddingBottom: Spacing.xxxl },
-  header: { gap: Spacing.xs, paddingTop: Spacing.sm },
-  block: { gap: Spacing.md },
-  blockTitle: { letterSpacing: 1.2 },
-  blockBody: { gap: Spacing.md },
-  badgeRow: { flexDirection: 'row', gap: Spacing.xl },
-  badge: { alignItems: 'center', gap: Spacing.sm },
-  listCard: { paddingVertical: Spacing.xs },
+  content: { paddingBottom: Spacing.xl },
+  body: { paddingHorizontal: Spacing.lg, gap: Spacing.lg, marginTop: -Spacing.xxl },
+  ratingCard: { paddingVertical: Spacing.sm },
+  ratingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+  },
+  regionPicker: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: Colors.border.subtle,
     marginLeft: Spacing.xxl + Spacing.xl,
   },
-  swatches: { flexDirection: 'row', gap: Spacing.sm },
-  swatch: { flex: 1, height: 48, borderRadius: Radius.md },
-  avatars: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
 });

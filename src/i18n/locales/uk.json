@@ -53,5 +53,9 @@
     "openSheet": "Відкрити панель",
     "sheetTitle": "Що робимо?",
     "palette": "Палітра"
+  },
+  "home": {
+    "compose": "Створити",
+    "seeAll": "Усі"
   }
 }
