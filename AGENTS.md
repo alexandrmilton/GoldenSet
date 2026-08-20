@@ -58,7 +58,8 @@ src/components/ui/  the design system: Text, Button, Card, Avatar, NtrpBadge,
 src/lib/        supabase client
 src/i18n/       i18next setup + locales/en.json, locales/uk.json
 docs/PLAN.md    the plan: stack, data model, rating maths, phases, branding
-docs/reference/ design reference images
+docs/reference/ source art: the design mock-up and the ball shot
+scripts/build-assets.py  regenerates everything in assets/images/ from that source art
 ```
 
 ## Commands

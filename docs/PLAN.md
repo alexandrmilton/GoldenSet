@@ -1,7 +1,9 @@
 # Golden Set — план розробки мобільного додатку (iOS + Android)
 
 > Дата плану: 18.08.2026
-> Референс дизайну: `5436043959869315807.jpg` (у корені проєкту)
+> Референс дизайну: `docs/reference/design-reference-home.jpg`
+> Вихідне зображення м'яча: `docs/reference/ball-source.png`
+> Ассети збираються з них скриптом `scripts/build-assets.py`
 > Автор проєкту: новачок у програмуванні, працює на Windows у VS Code разом з Claude Code
 
 ---
