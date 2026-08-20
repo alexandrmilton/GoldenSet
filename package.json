@@ -8,6 +8,7 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/native": "^7.1.8",
     "@supabase/supabase-js": "^2.58.0",
+    "@tanstack/react-query": "^5.101.4",
     "expo": "~54.0.36",
     "expo-constants": "~18.0.13",
     "expo-font": "~14.0.12",
@@ -49,7 +50,8 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "db:migrate": "supabase db push",
-    "db:types": "supabase gen types typescript --project-id ambzvllckvbhvylgleol > src/lib/database.types.ts"
+    "db:types": "supabase gen types typescript --project-id ambzvllckvbhvylgleol > src/lib/database.types.ts",
+    "web:preview": "expo start --web --port 8092"
   },
   "private": true
 }

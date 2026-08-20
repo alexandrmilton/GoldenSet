@@ -24,8 +24,3 @@ export const MOCK_TOURNAMENT = {
   name: 'Кубок Літа',
   meta: '15–16 червня · Київ',
 };
-
-export const MOCK_VIEWER = {
-  name: 'Oleksandr M',
-  unread: 3,
-};

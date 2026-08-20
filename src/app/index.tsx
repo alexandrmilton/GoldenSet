@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -7,7 +8,9 @@ import { BottomNav, type NavKey } from '@/components/home/bottom-nav';
 import { Hero } from '@/components/home/hero';
 import { TournamentBanner } from '@/components/home/tournament-banner';
 import { Button, Card, ListRow, SegmentedControl, Sheet, Text, type SegmentedOption } from '@/components/ui';
-import { MOCK_PLAYERS, MOCK_TOURNAMENT, MOCK_VIEWER } from '@/features/home/mock';
+import { useSession } from '@/features/auth/session';
+import { MOCK_PLAYERS, MOCK_TOURNAMENT } from '@/features/home/mock';
+import { useMyProfile } from '@/features/profile/queries';
 import { Colors, Spacing } from '@/theme/tokens';
 
 type Section = 'rating' | 'tournaments' | 'calendar' | 'profile';
@@ -18,6 +21,9 @@ type Section = 'rating' | 'tournaments' | 'calendar' | 'profile';
  */
 export default function HomeScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
+  const { session } = useSession();
+  const { data: profile } = useMyProfile(session?.user.id);
   const [section, setSection] = useState<Section>('rating');
   const [tab, setTab] = useState<NavKey>('home');
   const [composeOpen, setComposeOpen] = useState(false);
@@ -44,8 +50,9 @@ export default function HomeScreen() {
         stickyHeaderIndices={[]}>
         <Hero
           tagline={t('common.tagline')}
-          playerName={MOCK_VIEWER.name}
-          unreadCount={MOCK_VIEWER.unread}
+          playerName={profile?.username ?? ''}
+          avatarUri={profile?.avatar_url}
+          onPressProfile={() => router.push('/profile')}
         />
 
         <View style={styles.body}>

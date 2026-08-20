@@ -4,8 +4,8 @@
     {
       "name": "golden-set-web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "web"],
-      "port": 8081
+      "runtimeArgs": ["run", "web:preview"],
+      "port": 8092
     }
   ]
 }

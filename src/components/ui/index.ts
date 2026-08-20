@@ -6,3 +6,4 @@ export { LevelBadge, type LevelBadgeProps, type LevelScale } from './level-badge
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './segmented-control';
 export { Sheet, type SheetProps } from './sheet';
 export { Text, type TextProps } from './text';
+export { TextField, type TextFieldProps } from './text-field';

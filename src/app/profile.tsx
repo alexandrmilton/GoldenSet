@@ -1,0 +1,84 @@
+import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { Avatar, Button, Card, LevelBadge, Text } from '@/components/ui';
+import { signOut, useSession } from '@/features/auth/session';
+import { useMyProfile } from '@/features/profile/queries';
+import { Colors, Spacing } from '@/theme/tokens';
+
+export default function ProfileScreen() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { session } = useSession();
+  const { data: profile } = useMyProfile(session?.user.id);
+
+  if (!profile) return <View style={styles.screen} />;
+
+  const ranked = profile.matches_played >= 5;
+
+  return (
+    <View style={styles.screen}>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.header}>
+            <Avatar name={profile.username} uri={profile.avatar_url} size={88} ring={Colors.gold} />
+            <View style={styles.identity}>
+              <Text variant="title">{profile.username}</Text>
+              {profile.city ? (
+                <Text variant="body" tone="secondary">
+                  {profile.city}
+                </Text>
+              ) : null}
+            </View>
+            {profile.level_value !== null ? (
+              <LevelBadge
+                value={profile.level_value}
+                scale={profile.level_scale}
+                verified={profile.level_source === 'verified'}
+              />
+            ) : null}
+          </View>
+
+          <Card style={styles.stats}>
+            <View style={styles.stat}>
+              <Text variant="caption" tone="secondary">
+                {t('profile.points')}
+              </Text>
+              <Text variant="numeric" tone={ranked ? 'gold' : 'tertiary'}>
+                {ranked ? String(profile.points) : t('profile.unranked')}
+              </Text>
+            </View>
+
+            <View style={styles.stat}>
+              <Text variant="caption" tone="secondary">
+                {t('profile.matches')}
+              </Text>
+              <Text variant="numeric">{String(profile.matches_played)}</Text>
+            </View>
+          </Card>
+
+          <Button
+            label={t('auth.signOut')}
+            variant="secondary"
+            onPress={async () => {
+              await signOut();
+              router.replace('/sign-in');
+            }}
+          />
+        </ScrollView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: Colors.bg.base },
+  safeArea: { flex: 1 },
+  content: { padding: Spacing.xl, gap: Spacing.xl },
+  header: { alignItems: 'center', gap: Spacing.md, paddingTop: Spacing.lg },
+  identity: { alignItems: 'center', gap: 2 },
+  stats: { flexDirection: 'row', gap: Spacing.xl },
+  stat: { flex: 1, gap: Spacing.xs },
+});
