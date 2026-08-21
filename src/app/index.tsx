@@ -96,7 +96,10 @@ export default function HomeScreen() {
         active={tab}
         labels={navLabels}
         composeLabel={t('home.compose')}
-        onSelect={setTab}
+        onSelect={(key) => {
+          setTab(key);
+          if (key === 'search') router.push('/players');
+        }}
         onCompose={() => setComposeOpen(true)}
       />
 

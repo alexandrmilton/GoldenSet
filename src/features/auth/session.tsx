@@ -44,6 +44,16 @@ export function useSession() {
   return useContext(SessionContext);
 }
 
+/**
+ * Signing out has to succeed locally even when the server refuses.
+ *
+ * A session whose user was deleted gets a 403 from /auth/v1/logout; without the
+ * fallback the stored token would survive and the app would come back up in the
+ * same stuck state it was signing out of.
+ */
 export async function signOut() {
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    await supabase.auth.signOut({ scope: 'local' });
+  }
 }

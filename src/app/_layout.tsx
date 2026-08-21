@@ -12,7 +12,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
-import { SessionProvider, useSession } from '@/features/auth/session';
+import { signOut, SessionProvider, useSession } from '@/features/auth/session';
 import { needsOnboarding, useMyProfile } from '@/features/profile/queries';
 import '@/i18n';
 import { queryClient } from '@/lib/query';
@@ -38,7 +38,7 @@ const goldenSetTheme = {
  */
 function AuthGate() {
   const { session, ready } = useSession();
-  const { data: profile, isLoading } = useMyProfile(session?.user.id);
+  const { data: profile, isLoading, isSuccess } = useMyProfile(session?.user.id);
   const segments = useSegments();
   const router = useRouter();
 
@@ -52,6 +52,14 @@ function AuthGate() {
       return;
     }
 
+    // A valid session whose profile is gone: the account was deleted while the
+    // token lived on. Without this the gate waits forever and the app sits on
+    // whatever screen it happened to render.
+    if (isSuccess && profile === null) {
+      signOut();
+      return;
+    }
+
     // Wait for the profile before deciding — otherwise we would bounce the user
     // through onboarding on every cold start.
     if (isLoading || !profile) return;
@@ -62,7 +70,7 @@ function AuthGate() {
     }
 
     if (route === 'sign-in' || route === 'onboarding') router.replace('/');
-  }, [ready, session, profile, isLoading, route, router]);
+  }, [ready, session, profile, isLoading, isSuccess, route, router]);
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }

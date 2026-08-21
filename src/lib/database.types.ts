@@ -266,6 +266,48 @@ export type Database = {
         }
       }
       points_to_level: { Args: { p: number }; Returns: number }
+      player_cities: {
+        Args: Record<string, never>
+        Returns: { city: string; players: number }[]
+      }
+      search_players: {
+        Args: {
+          p_search?: string | null
+          p_city?: string | null
+          p_level_min?: number | null
+          p_level_max?: number | null
+          p_age_min?: number | null
+          p_age_max?: number | null
+          p_gender?: string | null
+          p_hand?: Database["public"]["Enums"]["playing_hand"] | null
+          p_statuses?: Database["public"]["Enums"]["rating_status"][] | null
+          p_balls_id?: string | null
+          p_court_id?: string | null
+          p_weekday?: number | null
+          p_sort?: string | null
+          p_limit?: number | null
+          p_offset?: number | null
+        }
+        Returns: {
+          id: string
+          username: string
+          full_name: string | null
+          avatar_url: string | null
+          city: string | null
+          district: string | null
+          birth_year: number | null
+          gender: string | null
+          hand: Database["public"]["Enums"]["playing_hand"] | null
+          points: number
+          level: number | null
+          rating_status: Database["public"]["Enums"]["rating_status"]
+          reliability: number
+          matches_played: number
+          last_active_at: string
+          balls_label: string | null
+          racquet_label: string | null
+        }[]
+      }
     }
     Enums: {
       equipment_kind: "racquet" | "string" | "balls" | "shoes"
@@ -287,3 +329,5 @@ export type EquipmentKind = Database["public"]["Enums"]["equipment_kind"]
 export type RatingStatus = Database["public"]["Enums"]["rating_status"]
 export type SeedMethod = Database["public"]["Enums"]["seed_method"]
 export type PlayingHand = Database["public"]["Enums"]["playing_hand"]
+export type PlayerSearchResult = Database["public"]["Functions"]["search_players"]["Returns"][number]
+export type PlayerFilters = Database["public"]["Functions"]["search_players"]["Args"]
