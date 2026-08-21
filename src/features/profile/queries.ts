@@ -8,8 +8,11 @@ export const profileKeys = {
   byId: (id: string) => ['profile', id] as const,
 };
 
-async function fetchProfile(id: string): Promise<Profile> {
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
+async function fetchProfile(id: string): Promise<Profile | null> {
+  // maybeSingle, not single: on a cold start the query can land before the row
+  // is visible to this session, and single() turns that into a hard 406 error
+  // rather than "not here yet". The gate already waits for a profile.
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -39,7 +42,6 @@ export type EditableProfile = Pick<
   | 'avatar_url'
   | 'birth_year'
   | 'gender'
-  | 'balls_preference'
 >;
 
 export function useUpdateMyProfile(userId: string | undefined) {

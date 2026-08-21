@@ -32,7 +32,11 @@
     "level": "Level",
     "unranked": "Not ranked yet",
     "seedRating": "Starting rating",
-    "seedValue": "{{level}} · {{points}} points · {{date}}"
+    "seedValue": "{{level}} · {{points}} points · {{date}}",
+    "equipment": "Equipment",
+    "racquet": "Racquet",
+    "balls": "Balls",
+    "noEquipment": "Not filled in yet"
   },
   "setup": {
     "phaseZero": "Foundation is ready",
@@ -171,6 +175,17 @@
       "assignedAnchor": "Assigned from the questionnaire and your anchor",
       "explain": "It is an estimate, not an earned rating — that is why it is shown in grey. After your first confirmed match it starts moving, and after five it settles.",
       "start": "Start playing"
-    }
+    },
+    "racquetTitle": "What do you play with?",
+    "racquetHint": "Used for your equipment statistics later.",
+    "racquetSearch": "Search brand or model",
+    "racquetOther": "My racquet is not on the list",
+    "racquetCustom": "Brand and model",
+    "strings": "Strings",
+    "stringsUnknown": "I don't know",
+    "tension": "Tension, kg",
+    "optional": "Optional — skip if you don't know",
+    "ballsTitle": "Which balls do you usually play?",
+    "ballsHint": "So an opponent knows what to bring."
   }
 }

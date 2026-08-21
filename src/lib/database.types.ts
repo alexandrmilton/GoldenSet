@@ -49,6 +49,7 @@ export type Database = {
         Row: {
           answer_key: string
           answer_value: string
+          question_order: number
           score: number
           sort_order: number
           step: number
@@ -56,6 +57,7 @@ export type Database = {
         Insert: {
           answer_key: string
           answer_value: string
+          question_order?: number
           score: number
           sort_order?: number
           step: number
@@ -63,16 +65,109 @@ export type Database = {
         Update: {
           answer_key?: string
           answer_value?: string
+          question_order?: number
           score?: number
           sort_order?: number
           step?: number
         }
         Relationships: []
       }
+      equipment_catalog: {
+        Row: {
+          brand: string
+          id: string
+          is_active: boolean
+          kind: Database["public"]["Enums"]["equipment_kind"]
+          model: string
+          specs: Json
+          year: number | null
+        }
+        Insert: {
+          brand: string
+          id?: string
+          is_active?: boolean
+          kind: Database["public"]["Enums"]["equipment_kind"]
+          model: string
+          specs?: Json
+          year?: number | null
+        }
+        Update: {
+          brand?: string
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["equipment_kind"]
+          model?: string
+          specs?: Json
+          year?: number | null
+        }
+        Relationships: []
+      }
+      user_equipment: {
+        Row: {
+          catalog_id: string | null
+          created_at: string
+          custom_name: string | null
+          grip_size: string | null
+          id: string
+          is_primary: boolean
+          kind: Database["public"]["Enums"]["equipment_kind"]
+          profile_id: string
+          retired_at: string | null
+          since: string | null
+          string_model: string | null
+          tension_kg: number | null
+          weight_g: number | null
+        }
+        Insert: {
+          catalog_id?: string | null
+          created_at?: string
+          custom_name?: string | null
+          grip_size?: string | null
+          id?: string
+          is_primary?: boolean
+          kind: Database["public"]["Enums"]["equipment_kind"]
+          profile_id: string
+          retired_at?: string | null
+          since?: string | null
+          string_model?: string | null
+          tension_kg?: number | null
+          weight_g?: number | null
+        }
+        Update: {
+          catalog_id?: string | null
+          created_at?: string
+          custom_name?: string | null
+          grip_size?: string | null
+          id?: string
+          is_primary?: boolean
+          kind?: Database["public"]["Enums"]["equipment_kind"]
+          profile_id?: string
+          retired_at?: string | null
+          since?: string | null
+          string_model?: string | null
+          tension_kg?: number | null
+          weight_g?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_equipment_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "equipment_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_equipment_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
-          balls_preference: string | null
           bio: string | null
           birth_year: number | null
           city: string | null
@@ -101,7 +196,6 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
-          balls_preference?: string | null
           bio?: string | null
           birth_year?: number | null
           city?: string | null
@@ -130,7 +224,6 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
-          balls_preference?: string | null
           bio?: string | null
           birth_year?: number | null
           city?: string | null
@@ -175,6 +268,7 @@ export type Database = {
       points_to_level: { Args: { p: number }; Returns: number }
     }
     Enums: {
+      equipment_kind: "racquet" | "string" | "balls" | "shoes"
       external_rating_kind: "ntrp" | "utr" | "wtn"
       playing_hand: "right" | "left"
       rating_status: "seed" | "provisional" | "established" | "confirmed" | "dormant"
@@ -187,6 +281,9 @@ export type Database = {
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
 export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
 export type OnboardingOption = Database["public"]["Tables"]["onboarding_options"]["Row"]
+export type CatalogItem = Database["public"]["Tables"]["equipment_catalog"]["Row"]
+export type UserEquipment = Database["public"]["Tables"]["user_equipment"]["Row"]
+export type EquipmentKind = Database["public"]["Enums"]["equipment_kind"]
 export type RatingStatus = Database["public"]["Enums"]["rating_status"]
 export type SeedMethod = Database["public"]["Enums"]["seed_method"]
 export type PlayingHand = Database["public"]["Enums"]["playing_hand"]

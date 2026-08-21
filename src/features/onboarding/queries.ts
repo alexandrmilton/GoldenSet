@@ -16,6 +16,9 @@ export type Question = {
  * Scores live server-side (see the onboarding_scoring migration), and an option
  * the server does not know scores zero — so the two lists must not drift apart.
  * Reading them from the same place makes drift impossible.
+ *
+ * Ordered by question_order, not by key: step 5 asks four questions and the
+ * key order is alphabetical, which is not the order they should be asked in.
  */
 export function useQuestionnaire() {
   return useQuery({
@@ -26,7 +29,7 @@ export function useQuestionnaire() {
         .from('onboarding_options')
         .select('*')
         .order('step')
-        .order('answer_key')
+        .order('question_order')
         .order('sort_order');
       if (error) throw error;
 

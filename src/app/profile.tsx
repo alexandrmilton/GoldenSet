@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar, Button, Card, LevelBadge, Text } from '@/components/ui';
 import { signOut, useSession } from '@/features/auth/session';
+import { useMyEquipment } from '@/features/equipment/queries';
 import { useMyProfile } from '@/features/profile/queries';
 import { Colors, Spacing } from '@/theme/tokens';
 
@@ -13,6 +14,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { session } = useSession();
   const { data: profile } = useMyProfile(session?.user.id);
+  const { data: equipment = [] } = useMyEquipment(session?.user.id);
 
   if (!profile) return <View style={styles.screen} />;
 
@@ -70,6 +72,38 @@ export default function ProfileScreen() {
             </View>
           </Card>
 
+          <Card style={styles.seedCard}>
+            <Text variant="caption" tone="secondary">
+              {t('profile.equipment')}
+            </Text>
+            {equipment.length === 0 ? (
+              <Text variant="body" tone="tertiary">
+                {t('profile.noEquipment')}
+              </Text>
+            ) : (
+              equipment.map((item) => {
+                const catalog = item.equipment_catalog;
+                const name = catalog ? `${catalog.brand} ${catalog.model}` : item.custom_name;
+                const detail = [item.string_model, item.tension_kg ? `${item.tension_kg} kg` : null]
+                  .filter(Boolean)
+                  .join(' · ');
+                return (
+                  <View key={item.id} style={styles.equipmentRow}>
+                    <Text variant="caption" tone="tertiary">
+                      {t(item.kind === 'balls' ? 'profile.balls' : 'profile.racquet')}
+                    </Text>
+                    <Text variant="body">{name ?? ''}</Text>
+                    {detail ? (
+                      <Text variant="caption" tone="tertiary">
+                        {detail}
+                      </Text>
+                    ) : null}
+                  </View>
+                );
+              })
+            )}
+          </Card>
+
           <Button
             label={t('auth.signOut')}
             variant="secondary"
@@ -91,6 +125,7 @@ const styles = StyleSheet.create({
   header: { alignItems: 'center', gap: Spacing.md, paddingTop: Spacing.lg },
   identity: { alignItems: 'center', gap: 2 },
   seedCard: { gap: Spacing.xs },
+  equipmentRow: { gap: 2, paddingTop: Spacing.xs },
   stats: { flexDirection: 'row', gap: Spacing.xl },
   stat: { flex: 1, gap: Spacing.xs },
 });
