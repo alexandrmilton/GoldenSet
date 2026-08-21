@@ -1,55 +1,83 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, Text, TextField } from '@/components/ui';
+import { Button, LevelBadge, Text, TextField } from '@/components/ui';
 import { useSession } from '@/features/auth/session';
+import {
+  useAnchorCandidates,
+  useApplyOnboarding,
+  useQuestionnaire,
+  type AnchorOutcome,
+} from '@/features/onboarding/queries';
 import { useUpdateMyProfile } from '@/features/profile/queries';
+import type { Profile } from '@/lib/database.types';
 import { Colors, Radius, Spacing } from '@/theme/tokens';
 
 const USERNAME_SHAPE = /^[a-z0-9_]{3,20}$/;
+const OUTCOMES: AnchorOutcome[] = ['i_win', 'even', 'they_win'];
 
 /**
- * The level calibrator. Players cannot reliably name their own NTRP number, but
- * they can recognise a description of how they play — so we ask that and map it.
+ * Seeding wizard, per docs/RATING.md §3.
+ *
+ * Basics, then the questionnaire read from the database, then the anchor, then
+ * the rating the server decided. The rating is never computed here: the client
+ * could simply claim a better one.
  */
-const LEVELS = [
-  { value: 3.0, key: 'level30' },
-  { value: 3.5, key: 'level35' },
-  { value: 4.0, key: 'level40' },
-  { value: 4.5, key: 'level45' },
-  { value: 5.0, key: 'level50' },
-] as const;
-
 export default function OnboardingScreen() {
   const { t } = useTranslation();
   const { session } = useSession();
-  const update = useUpdateMyProfile(session?.user.id);
+  const { data: questions = [] } = useQuestionnaire();
+  const updateProfile = useUpdateMyProfile(session?.user.id);
+  const apply = useApplyOnboarding();
 
+  const [index, setIndex] = useState(0);
   const [username, setUsername] = useState('');
   const [city, setCity] = useState('');
-  const [level, setLevel] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [anchorSearch, setAnchorSearch] = useState('');
+  const [anchorId, setAnchorId] = useState<string | null>(null);
+  const [anchorName, setAnchorName] = useState<string | null>(null);
+  const [anchorOutcome, setAnchorOutcome] = useState<AnchorOutcome | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [seeded, setSeeded] = useState<Profile | null>(null);
 
+  const { data: candidates = [] } = useAnchorCandidates(anchorSearch);
+
+  // basics + one screen per question + the anchor
+  const total = questions.length + 2;
   const normalised = username.trim().toLowerCase();
   const usernameValid = USERNAME_SHAPE.test(normalised);
+  const question = index > 0 && index <= questions.length ? questions[index - 1] : null;
+  const onAnchorStep = index === questions.length + 1;
+
+  const canAdvance = useMemo(() => {
+    if (index === 0) return usernameValid;
+    if (question) return Boolean(answers[question.key]);
+    return true;
+  }, [index, usernameValid, question, answers]);
 
   const submit = async () => {
     setError(null);
     try {
-      await update.mutateAsync({
-        username: normalised,
-        city: city.trim() || null,
-        level_scale: 'ntrp',
-        level_value: level,
+      await updateProfile.mutateAsync({ username: normalised, city: city.trim() || null });
+      const profile = await apply.mutateAsync({
+        answers,
+        questions,
+        anchorId,
+        anchorOutcome: anchorId ? (anchorOutcome ?? 'even') : null,
       });
+      setSeeded(profile);
     } catch (cause) {
-      // 23505 is the unique violation on username — the one error a player can fix.
       const code = (cause as { code?: string }).code;
       setError(code === '23505' ? t('onboarding.usernameTaken') : t('auth.errorGeneric'));
     }
   };
+
+  if (seeded) {
+    return <SeedResult profile={seeded} />;
+  }
 
   return (
     <View style={styles.screen}>
@@ -59,70 +87,190 @@ export default function OnboardingScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
             <View style={styles.header}>
-              <Text variant="title">{t('onboarding.title')}</Text>
-              <Text variant="body" tone="secondary">
-                {t('onboarding.subtitle')}
+              <Text variant="label" tone="tertiary">
+                {t('onboarding.stepOf', { current: index + 1, total })}
               </Text>
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { flex: index + 1 }]} />
+                <View style={{ flex: total - index - 1 }} />
+              </View>
             </View>
 
-            <TextField
-              label={t('onboarding.username')}
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-              autoCorrect={false}
-              hint={t('onboarding.usernameHint')}
-              error={error ?? (username && !usernameValid ? t('onboarding.usernameInvalid') : null)}
-            />
+            {index === 0 ? (
+              <View style={styles.block}>
+                <Text variant="title">{t('onboarding.title')}</Text>
+                <Text variant="body" tone="secondary">
+                  {t('onboarding.subtitle')}
+                </Text>
+                <TextField
+                  label={t('onboarding.username')}
+                  value={username}
+                  onChangeText={setUsername}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  hint={t('onboarding.usernameHint')}
+                  error={username && !usernameValid ? t('onboarding.usernameInvalid') : null}
+                />
+                <TextField
+                  label={t('onboarding.city')}
+                  value={city}
+                  onChangeText={setCity}
+                  placeholder={t('onboarding.cityPlaceholder')}
+                />
+              </View>
+            ) : null}
 
-            <TextField
-              label={t('onboarding.city')}
-              value={city}
-              onChangeText={setCity}
-              placeholder={t('onboarding.cityPlaceholder')}
-            />
+            {question ? (
+              <View style={styles.block}>
+                <Text variant="title">{t(`onboarding.q.${question.key}`)}</Text>
+                {question.values.map((value) => {
+                  const selected = answers[question.key] === value;
+                  return (
+                    <Pressable
+                      key={value}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected }}
+                      onPress={() => setAnswers((prev) => ({ ...prev, [question.key]: value }))}
+                      style={[styles.option, selected && styles.optionSelected]}>
+                      <Text variant="body" tone={selected ? 'onClay' : 'primary'}>
+                        {t(`onboarding.opt.${question.key}.${value}`)}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ) : null}
 
-            <View style={styles.levels}>
-              <Text variant="label" tone="secondary">
-                {t('onboarding.levelTitle')}
-              </Text>
+            {onAnchorStep ? (
+              <View style={styles.block}>
+                <Text variant="title">{t('onboarding.q.anchor')}</Text>
+                <Text variant="caption" tone="secondary">
+                  {t('onboarding.anchor.hint')}
+                </Text>
 
-              {LEVELS.map((option) => {
-                const selected = level === option.value;
-                return (
-                  <Pressable
-                    key={option.key}
-                    accessibilityRole="radio"
-                    accessibilityState={{ selected }}
-                    onPress={() => setLevel(option.value)}
-                    style={[styles.level, selected && styles.levelSelected]}>
-                    <Text variant="numericSmall" tone={selected ? 'onClay' : 'gold'}>
-                      {option.value.toFixed(1)}
+                <TextField
+                  label={t('onboarding.anchor.search')}
+                  value={anchorSearch}
+                  onChangeText={setAnchorSearch}
+                  autoCapitalize="none"
+                />
+
+                {candidates.map((candidate) => {
+                  const selected = anchorId === candidate.id;
+                  return (
+                    <Pressable
+                      key={candidate.id}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected }}
+                      onPress={() => {
+                        setAnchorId(candidate.id);
+                        setAnchorName(candidate.username);
+                      }}
+                      style={[styles.option, selected && styles.optionSelected]}>
+                      <Text variant="body" tone={selected ? 'onClay' : 'primary'}>
+                        {candidate.username}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+
+                {anchorId ? (
+                  <View style={styles.block}>
+                    <Text variant="label" tone="secondary">
+                      {t('onboarding.anchor.outcome')}
                     </Text>
-                    <Text
-                      variant="body"
-                      tone={selected ? 'onClay' : 'primary'}
-                      style={styles.levelLabel}>
-                      {t(`onboarding.${option.key}`)}
+                    {OUTCOMES.map((outcome) => {
+                      const selected = anchorOutcome === outcome;
+                      return (
+                        <Pressable
+                          key={outcome}
+                          accessibilityRole="radio"
+                          accessibilityState={{ selected }}
+                          onPress={() => setAnchorOutcome(outcome)}
+                          style={[styles.option, selected && styles.optionSelected]}>
+                          <Text variant="body" tone={selected ? 'onClay' : 'primary'}>
+                            {t(`onboarding.anchor.${outcome}`)}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                    <Text variant="caption" tone="tertiary">
+                      {t('onboarding.anchor.chosen', { name: anchorName })}
                     </Text>
-                  </Pressable>
-                );
-              })}
+                  </View>
+                ) : (
+                  <Text variant="caption" tone="tertiary">
+                    {t('onboarding.anchor.none')}
+                  </Text>
+                )}
+              </View>
+            ) : null}
 
-              <Text variant="caption" tone="tertiary">
-                {t('onboarding.levelHint')}
+            {error ? (
+              <Text variant="caption" tone="down">
+                {error}
               </Text>
+            ) : null}
+
+            <View style={styles.actions}>
+              {onAnchorStep ? (
+                <Button
+                  label={t('onboarding.finish')}
+                  size="lg"
+                  loading={apply.isPending || updateProfile.isPending}
+                  onPress={submit}
+                />
+              ) : (
+                <Button
+                  label={t('onboarding.next')}
+                  size="lg"
+                  disabled={!canAdvance}
+                  onPress={() => setIndex((i) => i + 1)}
+                />
+              )}
+
+              {index > 0 ? (
+                <Button
+                  label={t('onboarding.back')}
+                  variant="ghost"
+                  onPress={() => setIndex((i) => i - 1)}
+                />
+              ) : null}
             </View>
-
-            <Button
-              label={t('onboarding.finish')}
-              size="lg"
-              loading={update.isPending}
-              disabled={!usernameValid || level === null}
-              onPress={submit}
-            />
           </ScrollView>
         </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+/** The starting rating, shown as assigned rather than earned. */
+function SeedResult({ profile }: { profile: Profile }) {
+  const { t } = useTranslation();
+
+  return (
+    <View style={styles.screen}>
+      <SafeAreaView style={[styles.safeArea, styles.resultArea]}>
+        <Text variant="label" tone="tertiary">
+          {t('onboarding.result.title')}
+        </Text>
+
+        <LevelBadge
+          value={profile.seed_level ?? 0}
+          status="seed"
+          size="lg"
+          points={profile.seed_points ?? undefined}
+        />
+
+        <Text variant="body" tone="secondary" style={styles.centered}>
+          {profile.seed_method === 'anchor'
+            ? t('onboarding.result.assignedAnchor')
+            : t('onboarding.result.assigned')}
+        </Text>
+
+        <Text variant="caption" tone="tertiary" style={styles.centered}>
+          {t('onboarding.result.explain')}
+        </Text>
       </SafeAreaView>
     </View>
   );
@@ -131,14 +279,14 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Colors.bg.base },
   safeArea: { flex: 1 },
+  resultArea: { alignItems: 'center', justifyContent: 'center', gap: Spacing.lg, padding: Spacing.xl },
   flex: { flex: 1 },
-  content: { flexGrow: 1, justifyContent: 'center', padding: Spacing.xl, gap: Spacing.lg },
-  header: { gap: Spacing.xs },
-  levels: { gap: Spacing.sm },
-  level: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
+  content: { flexGrow: 1, justifyContent: 'center', padding: Spacing.xl, gap: Spacing.xl },
+  header: { gap: Spacing.sm },
+  progressTrack: { flexDirection: 'row', height: 3, borderRadius: Radius.pill, backgroundColor: Colors.bg.surface },
+  progressFill: { backgroundColor: Colors.clay[500], borderRadius: Radius.pill },
+  block: { gap: Spacing.md },
+  option: {
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
     borderRadius: Radius.md,
@@ -146,6 +294,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border.subtle,
     backgroundColor: Colors.bg.surface,
   },
-  levelSelected: { backgroundColor: Colors.clay[500], borderColor: Colors.clay[300] },
-  levelLabel: { flex: 1 },
+  optionSelected: { backgroundColor: Colors.clay[500], borderColor: Colors.clay[300] },
+  actions: { gap: Spacing.sm },
+  centered: { textAlign: 'center' },
 });

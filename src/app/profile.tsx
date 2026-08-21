@@ -32,14 +32,25 @@ export default function ProfileScreen() {
                 </Text>
               ) : null}
             </View>
-            {profile.level_value !== null ? (
-              <LevelBadge
-                value={profile.level_value}
-                scale={profile.level_scale}
-                verified={profile.level_source === 'verified'}
-              />
+            {profile.level !== null ? (
+              <LevelBadge value={profile.level} status={profile.rating_status} />
             ) : null}
           </View>
+
+          {profile.seed_level !== null ? (
+            <Card style={styles.seedCard}>
+              <Text variant="caption" tone="secondary">
+                {t('profile.seedRating')}
+              </Text>
+              <Text variant="bodyStrong" tone="secondary">
+                {t('profile.seedValue', {
+                  level: profile.seed_level.toFixed(1),
+                  points: profile.seed_points,
+                  date: profile.seed_at ? new Date(profile.seed_at).toLocaleDateString() : '',
+                })}
+              </Text>
+            </Card>
+          ) : null}
 
           <Card style={styles.stats}>
             <View style={styles.stat}>
@@ -79,6 +90,7 @@ const styles = StyleSheet.create({
   content: { padding: Spacing.xl, gap: Spacing.xl },
   header: { alignItems: 'center', gap: Spacing.md, paddingTop: Spacing.lg },
   identity: { alignItems: 'center', gap: 2 },
+  seedCard: { gap: Spacing.xs },
   stats: { flexDirection: 'row', gap: Spacing.xl },
   stat: { flex: 1, gap: Spacing.xs },
 });

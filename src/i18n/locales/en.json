@@ -30,7 +30,9 @@
     "points": "Rating points",
     "matches": "Matches played",
     "level": "Level",
-    "unranked": "Not ranked yet"
+    "unranked": "Not ranked yet",
+    "seedRating": "Starting rating",
+    "seedValue": "{{level}} · {{points}} points · {{date}}"
   },
   "setup": {
     "phaseZero": "Foundation is ready",
@@ -78,20 +80,97 @@
   },
   "onboarding": {
     "title": "Set up your profile",
-    "subtitle": "Two things and you are in.",
+    "subtitle": "A few questions so we can place you at the right level.",
+    "stepOf": "Step {{current}} of {{total}}",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "finish": "Get my rating",
     "username": "Username",
     "usernameHint": "3–20 characters: a–z, 0–9, underscore",
     "usernameTaken": "That username is taken.",
     "usernameInvalid": "Use only a–z, 0–9 and underscore, 3–20 characters.",
     "city": "City",
     "cityPlaceholder": "Kyiv",
-    "levelTitle": "Your level",
-    "levelHint": "A starting estimate — it gets confirmed once you play.",
-    "level30": "Rallying, learning to serve",
-    "level35": "Consistent from the baseline",
-    "level40": "Directing shots, dependable serve",
-    "level45": "Power and spin, tactical play",
-    "level50": "Tournament level",
-    "finish": "Start playing"
+    "q": {
+      "years": "How long have you been playing?",
+      "frequency": "How often do you play now?",
+      "coaching": "Have you been coached?",
+      "competition": "Have you played for score?",
+      "serve": "Your serve",
+      "baseline": "Consistency from the baseline",
+      "direction": "Control over where the ball goes",
+      "volley": "Play at the net",
+      "anchor": "Do you play with someone already on Golden Set?"
+    },
+    "opt": {
+      "years": {
+        "never": "Never held a racquet",
+        "under_1": "Less than a year",
+        "1_3": "1–3 years",
+        "3_7": "3–7 years",
+        "over_7": "More than 7 years"
+      },
+      "frequency": {
+        "rarely": "Less than once a month",
+        "monthly": "1–3 times a month",
+        "weekly": "1–2 times a week",
+        "often": "3 or more times a week"
+      },
+      "coaching": {
+        "none": "Never had lessons",
+        "few_lessons": "A few one-off lessons",
+        "regular": "Regularly, with a coach",
+        "academy": "Sports school or junior competition"
+      },
+      "competition": {
+        "none": "Never played for score",
+        "friends": "For score, with friends",
+        "league": "Club league or regular matches",
+        "tournaments": "Amateur tournaments",
+        "podium": "Podium finishes in amateur tournaments"
+      },
+      "serve": {
+        "weak": "Often double-fault",
+        "basic": "Gets the ball in play",
+        "solid": "Reliable second serve",
+        "strong": "Serve wins me points"
+      },
+      "baseline": {
+        "weak": "Rally falls apart quickly",
+        "basic": "A few shots in a row",
+        "solid": "Long rallies are fine",
+        "strong": "I dictate the rally"
+      },
+      "direction": {
+        "weak": "Wherever it goes",
+        "basic": "Roughly the right side",
+        "solid": "I hit where I aim",
+        "strong": "I move my opponent around"
+      },
+      "volley": {
+        "weak": "I avoid the net",
+        "basic": "I can put it away sometimes",
+        "solid": "Comfortable at the net",
+        "strong": "The net is my game"
+      }
+    },
+    "anchor": {
+      "search": "Search by username",
+      "outcome": "Who usually wins?",
+      "i_win": "Usually me",
+      "even": "About even",
+      "they_win": "Usually them",
+      "hint": "This is the strongest signal we have — it anchors you to a rating that was actually measured.",
+      "none": "Skip, I don't know anyone here yet",
+      "chosen": "Anchored to {{name}}"
+    },
+    "result": {
+      "title": "Your starting rating",
+      "assigned": "Assigned from the questionnaire",
+      "assignedAnchor": "Assigned from the questionnaire and your anchor",
+      "explain": "It is an estimate, not an earned rating — that is why it is shown in grey. After your first confirmed match it starts moving, and after five it settles.",
+      "start": "Start playing"
+    }
   }
 }

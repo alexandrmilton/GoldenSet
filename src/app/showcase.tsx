@@ -70,13 +70,13 @@ export default function ShowcaseScreen() {
           <Block title={t('showcase.levelBadge')}>
             <View style={styles.badgeRow}>
               <Badge caption={t('showcase.selfDeclared')}>
-                <LevelBadge value={4.5} />
+                <LevelBadge value={4.5} status="seed" />
               </Badge>
               <Badge caption={t('showcase.verified')}>
-                <LevelBadge value={5} verified />
+                <LevelBadge value={5} status="confirmed" />
               </Badge>
               <Badge caption={t('showcase.utrScale')}>
-                <LevelBadge value={9.5} scale="utr" />
+                <LevelBadge value={4} status="established" />
               </Badge>
             </View>
           </Block>

@@ -23,13 +23,23 @@ export function useMyProfile(userId: string | undefined) {
 }
 
 /**
- * Only the columns a player owns. points, matches_played and level_source are
- * deliberately absent — the database reverts them anyway (see the profiles
- * migration), and leaving them out keeps that rule visible in the code.
+ * Only the columns a player owns. Every rating column is deliberately absent —
+ * the database reverts them anyway (see the profiles migration), and leaving
+ * them out keeps that rule visible in the code.
  */
 export type EditableProfile = Pick<
   ProfileUpdate,
-  'username' | 'full_name' | 'city' | 'region' | 'level_scale' | 'level_value' | 'hand' | 'bio' | 'avatar_url'
+  | 'username'
+  | 'full_name'
+  | 'city'
+  | 'district'
+  | 'region'
+  | 'hand'
+  | 'bio'
+  | 'avatar_url'
+  | 'birth_year'
+  | 'gender'
+  | 'balls_preference'
 >;
 
 export function useUpdateMyProfile(userId: string | undefined) {
@@ -53,8 +63,12 @@ export function useUpdateMyProfile(userId: string | undefined) {
   });
 }
 
-/** A profile still carrying its generated username has not been set up yet. */
+/**
+ * Setup is complete once the questionnaire has produced a starting rating.
+ * seed_at is the marker because only the server can set it, so a client cannot
+ * skip the questionnaire by writing a username of its own.
+ */
 export function needsOnboarding(profile: Profile | undefined) {
   if (!profile) return false;
-  return profile.username.startsWith('player_') || profile.level_value === null;
+  return profile.seed_at === null;
 }
