@@ -1,9 +1,10 @@
+import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, LevelBadge, Text, TextField } from '@/components/ui';
+import { Button, Text, TextField } from '@/components/ui';
 import { useSession } from '@/features/auth/session';
 import {
   useAnchorCandidates,
@@ -12,7 +13,6 @@ import {
   type AnchorOutcome,
 } from '@/features/onboarding/queries';
 import { useUpdateMyProfile } from '@/features/profile/queries';
-import type { Profile } from '@/lib/database.types';
 import { Colors, Radius, Spacing } from '@/theme/tokens';
 
 const USERNAME_SHAPE = /^[a-z0-9_]{3,20}$/;
@@ -27,6 +27,7 @@ const OUTCOMES: AnchorOutcome[] = ['i_win', 'even', 'they_win'];
  */
 export default function OnboardingScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { session } = useSession();
   const { data: questions = [] } = useQuestionnaire();
   const updateProfile = useUpdateMyProfile(session?.user.id);
@@ -41,7 +42,6 @@ export default function OnboardingScreen() {
   const [anchorName, setAnchorName] = useState<string | null>(null);
   const [anchorOutcome, setAnchorOutcome] = useState<AnchorOutcome | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [seeded, setSeeded] = useState<Profile | null>(null);
 
   const { data: candidates = [] } = useAnchorCandidates(anchorSearch);
 
@@ -62,22 +62,18 @@ export default function OnboardingScreen() {
     setError(null);
     try {
       await updateProfile.mutateAsync({ username: normalised, city: city.trim() || null });
-      const profile = await apply.mutateAsync({
+      await apply.mutateAsync({
         answers,
         questions,
         anchorId,
         anchorOutcome: anchorId ? (anchorOutcome ?? 'even') : null,
       });
-      setSeeded(profile);
+      router.replace('/welcome');
     } catch (cause) {
       const code = (cause as { code?: string }).code;
       setError(code === '23505' ? t('onboarding.usernameTaken') : t('auth.errorGeneric'));
     }
   };
-
-  if (seeded) {
-    return <SeedResult profile={seeded} />;
-  }
 
   return (
     <View style={styles.screen}>
@@ -244,42 +240,9 @@ export default function OnboardingScreen() {
   );
 }
 
-/** The starting rating, shown as assigned rather than earned. */
-function SeedResult({ profile }: { profile: Profile }) {
-  const { t } = useTranslation();
-
-  return (
-    <View style={styles.screen}>
-      <SafeAreaView style={[styles.safeArea, styles.resultArea]}>
-        <Text variant="label" tone="tertiary">
-          {t('onboarding.result.title')}
-        </Text>
-
-        <LevelBadge
-          value={profile.seed_level ?? 0}
-          status="seed"
-          size="lg"
-          points={profile.seed_points ?? undefined}
-        />
-
-        <Text variant="body" tone="secondary" style={styles.centered}>
-          {profile.seed_method === 'anchor'
-            ? t('onboarding.result.assignedAnchor')
-            : t('onboarding.result.assigned')}
-        </Text>
-
-        <Text variant="caption" tone="tertiary" style={styles.centered}>
-          {t('onboarding.result.explain')}
-        </Text>
-      </SafeAreaView>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Colors.bg.base },
   safeArea: { flex: 1 },
-  resultArea: { alignItems: 'center', justifyContent: 'center', gap: Spacing.lg, padding: Spacing.xl },
   flex: { flex: 1 },
   content: { flexGrow: 1, justifyContent: 'center', padding: Spacing.xl, gap: Spacing.xl },
   header: { gap: Spacing.sm },
@@ -296,5 +259,4 @@ const styles = StyleSheet.create({
   },
   optionSelected: { backgroundColor: Colors.clay[500], borderColor: Colors.clay[300] },
   actions: { gap: Spacing.sm },
-  centered: { textAlign: 'center' },
 });
