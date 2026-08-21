@@ -3,8 +3,10 @@
 Tennis community app for iOS + Android. Find a partner at your level, log matches,
 climb the rating, join tournaments.
 
-**The full plan lives in [`docs/PLAN.md`](docs/PLAN.md). Read it before making decisions —
-it records not just what we do, but why.** This file is the short version.
+**Read before making decisions — these record not just what we do, but why:**
+[`docs/PLAN.md`](docs/PLAN.md) the overall plan and phases · [`docs/RATING.md`](docs/RATING.md) the rating system, which everything else rests on · [`docs/MODULES.md`](docs/MODULES.md) the product modules.
+
+This file is the short version.
 
 ## Expo has changed
 
@@ -40,7 +42,9 @@ without deciding that question first — see `docs/PLAN.md` §14.
    Ukrainian needs 3 plural forms (`_one/_few/_many`), English 2 — use i18next plurals, never
    manual string concatenation.
 4. **Rating points are written by the server only.** Never from the client. The Elo maths lives in
-   one Edge Function and is unit-tested. See `docs/PLAN.md` §5.
+   one Edge Function and is unit-tested. The full specification — seeding questionnaire, K factors,
+   match weights, tournament points, the duty rules that keep a high rating confirmed — is
+   `docs/RATING.md`. Do not invent rating behaviour that is not in it; change the document first.
 5. **Secrets.** Only `EXPO_PUBLIC_*` keys may reach the app bundle (RLS protects them).
    `SUPABASE_SERVICE_ROLE_KEY` belongs in Edge Function / GitHub secrets and nowhere else.
    `.env` is git-ignored; keep `.env.example` in sync when adding a variable.
@@ -57,7 +61,9 @@ src/components/ui/  the design system: Text, Button, Card, Avatar, NtrpBadge,
                 SegmentedControl, ListRow, Sheet — build screens from these
 src/lib/        supabase client
 src/i18n/       i18next setup + locales/en.json, locales/uk.json
-docs/PLAN.md    the plan: stack, data model, rating maths, phases, branding
+docs/PLAN.md    the plan: stack, data model, phases, branding
+docs/RATING.md  the rating system — the base the product rests on
+docs/MODULES.md the product modules and the order they get built in
 docs/reference/ source art: the design mock-up and the ball shot
 scripts/build-assets.py  regenerates everything in assets/images/ from that source art
 ```
