@@ -41,10 +41,14 @@ without deciding that question first — see `docs/PLAN.md` §14.
    `src/i18n/locales/en.json` and `uk.json`. ESLint enforces this and will fail the build.
    Ukrainian needs 3 plural forms (`_one/_few/_many`), English 2 — use i18next plurals, never
    manual string concatenation.
-4. **Rating points are written by the server only.** Never from the client. The Elo maths lives in
-   one Edge Function and is unit-tested. The full specification — seeding questionnaire, K factors,
-   match weights, tournament points, the duty rules that keep a high rating confirmed — is
-   `docs/RATING.md`. Do not invent rating behaviour that is not in it; change the document first.
+4. **Rating points are written by the server only.** Never from the client — the profiles trigger
+   reverts any client write to a rating column. The maths lives in one place, the database
+   functions `gs_*` / `apply_match_rating`, because the pre-match forecast and the post-match award
+   must call the same code: a forecast that disagreed with the award would cost more trust than any
+   other bug here. Checks are in `supabase/tests/rating.sql` and every row must say ok.
+   The full specification — seeding questionnaire, K factors, match weights, tournament points, the
+   duty rules that keep a high rating confirmed — is `docs/RATING.md`. Do not invent rating
+   behaviour that is not in it; change the document first.
 5. **Secrets.** Only `EXPO_PUBLIC_*` keys may reach the app bundle (RLS protects them).
    `SUPABASE_SERVICE_ROLE_KEY` belongs in Edge Function / GitHub secrets and nowhere else.
    `.env` is git-ignored; keep `.env.example` in sync when adding a variable.
