@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 
 import { signOut, SessionProvider, useSession } from '@/features/auth/session';
 import { needsOnboarding, useMyProfile } from '@/features/profile/queries';
-import '@/i18n';
+import { restoreLanguage } from '@/i18n';
 import { queryClient } from '@/lib/query';
 import { Colors } from '@/theme/tokens';
 
@@ -82,6 +82,10 @@ export default function RootLayout() {
     InterTight_600SemiBold,
     InterTight_700Bold,
   });
+
+  useEffect(() => {
+    restoreLanguage();
+  }, []);
 
   useEffect(() => {
     // Show the app once the type is ready — or anyway if the font failed, so a

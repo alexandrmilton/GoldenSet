@@ -36,7 +36,8 @@
     "equipment": "Equipment",
     "racquet": "Racquet",
     "balls": "Balls",
-    "noEquipment": "Not filled in yet"
+    "noEquipment": "Not filled in yet",
+    "language": "Language"
   },
   "setup": {
     "phaseZero": "Foundation is ready",

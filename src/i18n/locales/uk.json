@@ -37,7 +37,8 @@
     "equipment": "Спорядження",
     "racquet": "Ракетка",
     "balls": "М'ячі",
-    "noEquipment": "Ще не заповнено"
+    "noEquipment": "Ще не заповнено",
+    "language": "Мова"
   },
   "setup": {
     "phaseZero": "Фундамент готовий",

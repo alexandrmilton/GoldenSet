@@ -3,14 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Avatar, Button, Card, LevelBadge, Text } from '@/components/ui';
+import { Avatar, Button, Card, Chip, LevelBadge, Text } from '@/components/ui';
 import { signOut, useSession } from '@/features/auth/session';
 import { useMyEquipment } from '@/features/equipment/queries';
+import { SUPPORTED_LANGUAGES, setLanguage } from '@/i18n';
 import { useMyProfile } from '@/features/profile/queries';
 import { Colors, Spacing } from '@/theme/tokens';
 
+/** Language names are shown in their own language, never translated. */
+const LANGUAGE_LABELS: Record<string, string> = { en: 'English', uk: 'Українська' };
+
 export default function ProfileScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const { session } = useSession();
   const { data: profile } = useMyProfile(session?.user.id);
@@ -104,6 +108,22 @@ export default function ProfileScreen() {
             )}
           </Card>
 
+          <Card style={styles.seedCard}>
+            <Text variant="caption" tone="secondary">
+              {t('profile.language')}
+            </Text>
+            <View style={styles.languages}>
+              {SUPPORTED_LANGUAGES.map((code) => (
+                <Chip
+                  key={code}
+                  label={LANGUAGE_LABELS[code]}
+                  selected={i18n.language === code}
+                  onPress={() => setLanguage(code)}
+                />
+              ))}
+            </View>
+          </Card>
+
           <Button
             label={t('auth.signOut')}
             variant="secondary"
@@ -126,6 +146,7 @@ const styles = StyleSheet.create({
   identity: { alignItems: 'center', gap: 2 },
   seedCard: { gap: Spacing.xs },
   equipmentRow: { gap: 2, paddingTop: Spacing.xs },
+  languages: { flexDirection: 'row', gap: Spacing.sm, paddingTop: Spacing.xs },
   stats: { flexDirection: 'row', gap: Spacing.xl },
   stat: { flex: 1, gap: Spacing.xs },
 });
