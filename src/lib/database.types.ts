@@ -303,6 +303,12 @@ export type Database = {
         Update: { delta?: number }
         Relationships: []
       }
+      match_equipment: {
+        Row: { match_id: string; profile_id: string; equipment_id: string }
+        Insert: { match_id: string; profile_id: string; equipment_id: string }
+        Update: { equipment_id?: string }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -462,6 +468,55 @@ export type Database = {
           winner_delta: number | null
         }[]
       }
+      player_stats: {
+        Args: { p_profile: string }
+        Returns: {
+          matches: number
+          wins: number
+          losses: number
+          win_pct: number
+          rated_matches: number
+          friendly_matches: number
+          current_streak: number
+          best_win_name: string | null
+          best_win_points: number | null
+        }[]
+      }
+      rating_series: {
+        Args: { p_profile: string }
+        Returns: { at: string; points: number; is_seed: boolean }[]
+      }
+      match_history: {
+        Args: { p_profile: string; p_limit?: number }
+        Returns: {
+          match_id: string
+          played_at: string
+          kind: Database["public"]["Enums"]["game_kind"]
+          won: boolean | null
+          opponent_id: string
+          opponent_name: string
+          score: string | null
+          delta: number | null
+          racquet_label: string | null
+          court_name: string | null
+          surface: string | null
+        }[]
+      }
+      head_to_head: {
+        Args: { p_profile: string; p_opponent: string }
+        Returns: { played: number; won: number; lost: number }[]
+      }
+      racquet_stats: {
+        Args: { p_profile: string }
+        Returns: {
+          equipment_id: string
+          label: string | null
+          matches: number
+          wins: number
+          win_pct: number
+          avg_delta: number
+        }[]
+      }
       points_to_level: { Args: { p: number }; Returns: number }
       player_cities: {
         Args: Record<string, never>
@@ -549,3 +604,7 @@ export type ForecastRow = Database["public"]["Functions"]["forecast_game"]["Retu
 export type HomeSummary = Database["public"]["Functions"]["home_summary"]["Returns"][number]
 export type Mover = Database["public"]["Functions"]["rating_movers"]["Returns"][number]
 export type FeedMatch = Database["public"]["Functions"]["recent_matches"]["Returns"][number]
+export type PlayerStats = Database["public"]["Functions"]["player_stats"]["Returns"][number]
+export type RatingPoint = Database["public"]["Functions"]["rating_series"]["Returns"][number]
+export type HistoryRow = Database["public"]["Functions"]["match_history"]["Returns"][number]
+export type RacquetStat = Database["public"]["Functions"]["racquet_stats"]["Returns"][number]

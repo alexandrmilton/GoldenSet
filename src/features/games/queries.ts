@@ -116,7 +116,7 @@ export function useRespondToChallenge() {
 
 export type SetScore = { a: number; b: number };
 
-export function useReportMatch() {
+export function useReportMatch(profileId?: string) {
   const client = useQueryClient();
 
   return useMutation({
@@ -135,12 +135,38 @@ export function useReportMatch() {
         p_game_id: input.gameId ?? undefined,
       });
       if (error) throw error;
-      return data as unknown as Match;
+      const match = data as unknown as Match;
+
+      // Attach the racquet automatically rather than asking after every match.
+      // Almost everyone plays with one, and a question per match would simply
+      // get skipped — leaving the equipment statistics permanently empty.
+      if (profileId) {
+        const { data: racquet } = await supabase
+          .from('user_equipment')
+          .select('id')
+          .eq('profile_id', profileId)
+          .eq('kind', 'racquet')
+          .eq('is_primary', true)
+          .is('retired_at', null)
+          .maybeSingle();
+
+        if (racquet) {
+          await supabase.from('match_equipment').insert({
+            match_id: match.id,
+            profile_id: profileId,
+            equipment_id: racquet.id,
+          });
+        }
+      }
+
+      return match;
     },
     onSuccess: () => {
       client.invalidateQueries({ queryKey: gameKeys.mine });
       client.invalidateQueries({ queryKey: gameKeys.pending });
       client.invalidateQueries({ queryKey: profileKeys.mine });
+      client.invalidateQueries({ queryKey: ['match-history'] });
+      client.invalidateQueries({ queryKey: ['racquet-stats'] });
     },
   });
 }

@@ -27,7 +27,7 @@ export default function GamesScreen() {
   const { data: pending = [] } = usePendingConfirmations(me);
   const respond = useRespondToChallenge();
   const confirm = useConfirmMatch(me);
-  const report = useReportMatch();
+  const report = useReportMatch(me);
 
   const [scoreFor, setScoreFor] = useState<Game | null>(null);
   const [sets, setSets] = useState<SetScore[]>([

@@ -302,5 +302,31 @@
     "vs": "vs",
     "outgoing": "Waiting for their answer",
     "cancel": "Cancel"
+  },
+  "stats": {
+    "title": "Statistics",
+    "record": "Record",
+    "wins": "Wins",
+    "losses": "Losses",
+    "winPct": "Win rate",
+    "streak": "Current streak",
+    "streak_one": "{{count}} win in a row",
+    "streak_other": "{{count}} wins in a row",
+    "noStreak": "No streak",
+    "bestWin": "Best win",
+    "bestWinValue": "{{name}} · {{points}}",
+    "chart": "Rating over time",
+    "chartEmpty": "Play a match and the line starts here.",
+    "seedPoint": "Start {{value}}",
+    "history": "Match history",
+    "allMatches": "All matches",
+    "noHistory": "No matches yet.",
+    "racquets": "By racquet",
+    "racquetLine": "{{matches}} matches · {{pct}}% wins · avg {{delta}}",
+    "noRacquets": "Mark which racquet you played with when you enter a score.",
+    "vs": "vs",
+    "friendly": "friendly",
+    "h2h": "Head to head",
+    "h2hValue": "{{won}}:{{lost}}"
   }
 }
