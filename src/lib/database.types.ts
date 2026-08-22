@@ -309,6 +309,74 @@ export type Database = {
         Update: { equipment_id?: string }
         Relationships: []
       }
+      threads: {
+        Row: {
+          id: string
+          kind: Database["public"]["Enums"]["thread_kind"]
+          ref_id: string | null
+          title: string | null
+          created_at: string
+        }
+        Insert: { kind: Database["public"]["Enums"]["thread_kind"]; ref_id?: string | null }
+        Update: { title?: string | null }
+        Relationships: []
+      }
+      thread_members: {
+        Row: {
+          thread_id: string
+          profile_id: string
+          is_moderator: boolean
+          last_read_at: string
+          muted: boolean
+          joined_at: string
+        }
+        Insert: { thread_id: string; profile_id: string }
+        Update: { last_read_at?: string; muted?: boolean }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          id: string
+          thread_id: string
+          author_id: string
+          body: string
+          attachment_url: string | null
+          reply_to: string | null
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+        }
+        Insert: { thread_id: string; author_id: string; body: string; reply_to?: string | null }
+        Update: { deleted_at?: string | null; deleted_by?: string | null; body?: string }
+        Relationships: []
+      }
+      blocks: {
+        Row: { blocker_id: string; blocked_id: string; created_at: string }
+        Insert: { blocker_id: string; blocked_id: string }
+        Update: Record<string, never>
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          id: string
+          reporter_id: string
+          target_type: Database["public"]["Enums"]["report_target"]
+          target_id: string
+          reason: string
+          status: Database["public"]["Enums"]["report_status"]
+          handled_by: string | null
+          handled_at: string | null
+          created_at: string
+        }
+        Insert: {
+          reporter_id: string
+          target_type: Database["public"]["Enums"]["report_target"]
+          target_id: string
+          reason: string
+        }
+        Update: { status?: Database["public"]["Enums"]["report_status"] }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -517,6 +585,11 @@ export type Database = {
           avg_delta: number
         }[]
       }
+      direct_thread: { Args: { p_other: string }; Returns: string }
+      unread_threads: {
+        Args: Record<string, never>
+        Returns: { thread_id: string; unread: number }[]
+      }
       points_to_level: { Args: { p: number }; Returns: number }
       player_cities: {
         Args: Record<string, never>
@@ -572,6 +645,9 @@ export type Database = {
       match_source: "casual" | "league" | "tournament"
       match_status: "pending" | "confirmed" | "disputed" | "void"
       playing_hand: "right" | "left"
+      report_status: "open" | "actioned" | "dismissed"
+      report_target: "message" | "profile" | "match"
+      thread_kind: "direct" | "match" | "tournament" | "club" | "global"
       rating_event_kind: "match" | "tournament" | "recalculation" | "decay"
       rating_status: "seed" | "provisional" | "established" | "confirmed" | "dormant"
       seed_method: "questionnaire" | "anchor" | "external_rating" | "coach"
@@ -608,3 +684,7 @@ export type PlayerStats = Database["public"]["Functions"]["player_stats"]["Retur
 export type RatingPoint = Database["public"]["Functions"]["rating_series"]["Returns"][number]
 export type HistoryRow = Database["public"]["Functions"]["match_history"]["Returns"][number]
 export type RacquetStat = Database["public"]["Functions"]["racquet_stats"]["Returns"][number]
+export type Thread = Database["public"]["Tables"]["threads"]["Row"]
+export type Message = Database["public"]["Tables"]["messages"]["Row"]
+export type ThreadKind = Database["public"]["Enums"]["thread_kind"]
+export type ReportTarget = Database["public"]["Enums"]["report_target"]

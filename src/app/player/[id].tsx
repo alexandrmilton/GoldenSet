@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar, Button, Card, LevelBadge, Text } from '@/components/ui';
+import { useOpenDirectThread } from '@/features/chat/queries';
 import { playerAge, usePlayer } from '@/features/players/queries';
 import { Colors, Spacing } from '@/theme/tokens';
 
@@ -16,6 +17,7 @@ export default function PlayerScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data } = usePlayer(id);
+  const openThread = useOpenDirectThread();
 
   const profile = data?.profile;
   if (!profile) return <View style={styles.screen} />;
@@ -49,6 +51,15 @@ export default function PlayerScreen() {
             label={t('games.challenge')}
             size="lg"
             onPress={() => router.push(`/challenge/${id}`)}
+          />
+
+          <Button
+            label={t('chat.title')}
+            variant="secondary"
+            onPress={async () => {
+              const threadId = await openThread.mutateAsync(id);
+              router.push(`/chat/${threadId}`);
+            }}
           />
 
           <Card style={styles.stats}>

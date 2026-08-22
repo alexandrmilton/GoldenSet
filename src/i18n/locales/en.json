@@ -328,5 +328,26 @@
     "friendly": "friendly",
     "h2h": "Head to head",
     "h2hValue": "{{won}}:{{lost}}"
+  },
+  "chat": {
+    "title": "Messages",
+    "global": "Golden Set",
+    "globalSubtitle": "Everyone",
+    "matchThread": "Match chat",
+    "empty": "No conversations yet.",
+    "emptyHint": "Accept a challenge and a match chat opens by itself.",
+    "placeholder": "Message",
+    "send": "Send",
+    "deleted": "Message removed",
+    "block": "Block",
+    "blocked": "Blocked. They can no longer write to you here.",
+    "report": "Report",
+    "reported": "Thanks — a moderator will look at this.",
+    "reportReason": "What is wrong?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "you": "You",
+    "unread_one": "{{count}} new",
+    "unread_other": "{{count}} new"
   }
 }
