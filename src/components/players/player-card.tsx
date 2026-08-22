@@ -17,6 +17,10 @@ export type PlayerCardProps = {
  * Everything needed to decide whether to play someone, without opening their
  * profile: level and how trustworthy that level is, where they are, how old
  * they are, and what they play with.
+ *
+ * The card is a plain view holding two separate press targets rather than a
+ * pressable card with a pressable inside it. Nested buttons are invalid HTML on
+ * web and make the inner target unreliable everywhere.
  */
 export function PlayerCard({ player, onPress, onChallenge }: PlayerCardProps) {
   const { t } = useTranslation();
@@ -32,33 +36,37 @@ export function PlayerCard({ player, onPress, onChallenge }: PlayerCardProps) {
     .filter(Boolean)
     .join(' · ');
 
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
-      <Avatar name={player.username} uri={player.avatar_url} size={52} />
+  const gear = [player.racquet_label, player.balls_label].filter(Boolean).join(' · ');
 
-      <View style={styles.body}>
-        <View style={styles.topLine}>
-          <Text variant="bodyStrong" numberOfLines={1} style={styles.name}>
-            {player.username}
+  return (
+    <View style={styles.card}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={onPress}
+        style={({ pressed }) => [styles.main, pressed && styles.pressed]}>
+        <Avatar name={player.username} uri={player.avatar_url} size={52} />
+
+        <View style={styles.body}>
+          <View style={styles.topLine}>
+            <Text variant="bodyStrong" numberOfLines={1} style={styles.name}>
+              {player.username}
+            </Text>
+            {player.level !== null ? (
+              <LevelBadge value={player.level} status={player.rating_status} />
+            ) : null}
+          </View>
+
+          <Text variant="caption" tone="secondary" numberOfLines={1}>
+            {meta}
           </Text>
-          {player.level !== null ? (
-            <LevelBadge value={player.level} status={player.rating_status} />
+
+          {gear ? (
+            <Text variant="caption" tone="tertiary" numberOfLines={1}>
+              {gear}
+            </Text>
           ) : null}
         </View>
-
-        <Text variant="caption" tone="secondary" numberOfLines={1}>
-          {meta}
-        </Text>
-
-        {player.balls_label || player.racquet_label ? (
-          <Text variant="caption" tone="tertiary" numberOfLines={1}>
-            {[player.racquet_label, player.balls_label].filter(Boolean).join(' · ')}
-          </Text>
-        ) : null}
-      </View>
+      </Pressable>
 
       <View style={styles.right}>
         <Text variant="numericSmall" tone="gold">
@@ -74,7 +82,7 @@ export function PlayerCard({ player, onPress, onChallenge }: PlayerCardProps) {
           <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
         )}
       </View>
-    </Pressable>
+    </View>
   );
 }
 
@@ -89,7 +97,8 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.border.subtle,
   },
-  pressed: { backgroundColor: Colors.bg.elevated },
+  main: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  pressed: { opacity: 0.7 },
   body: { flex: 1, gap: 2 },
   topLine: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   name: { flexShrink: 1 },

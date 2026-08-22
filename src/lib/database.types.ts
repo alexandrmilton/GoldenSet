@@ -424,6 +424,44 @@ export type Database = {
         }
         Returns: Database["public"]["Tables"]["matches"]["Row"]
       }
+      home_summary: {
+        Args: Record<string, never>
+        Returns: {
+          points: number
+          level: number | null
+          rating_status: Database["public"]["Enums"]["rating_status"]
+          reliability: number
+          delta_week: number
+          city_rank: number | null
+          city_total: number | null
+        }[]
+      }
+      rating_movers: {
+        Args: { p_days?: number; p_limit?: number }
+        Returns: {
+          profile_id: string
+          username: string
+          avatar_url: string | null
+          city: string | null
+          level: number | null
+          points: number
+          gained: number
+        }[]
+      }
+      recent_matches: {
+        Args: { p_limit?: number }
+        Returns: {
+          match_id: string
+          played_at: string
+          kind: Database["public"]["Enums"]["game_kind"]
+          winner_id: string
+          winner_name: string
+          loser_id: string
+          loser_name: string
+          score: string | null
+          winner_delta: number | null
+        }[]
+      }
       points_to_level: { Args: { p: number }; Returns: number }
       player_cities: {
         Args: Record<string, never>
@@ -508,3 +546,6 @@ export type GameFormat = Database["public"]["Enums"]["game_format"]
 export type GameStatus = Database["public"]["Enums"]["game_status"]
 export type BallsMode = Database["public"]["Enums"]["balls_mode"]
 export type ForecastRow = Database["public"]["Functions"]["forecast_game"]["Returns"][number]
+export type HomeSummary = Database["public"]["Functions"]["home_summary"]["Returns"][number]
+export type Mover = Database["public"]["Functions"]["rating_movers"]["Returns"][number]
+export type FeedMatch = Database["public"]["Functions"]["recent_matches"]["Returns"][number]
