@@ -165,6 +165,144 @@ export type Database = {
           },
         ]
       }
+      games: {
+        Row: {
+          balls_catalog_id: string | null
+          balls_mode: Database["public"]["Enums"]["balls_mode"]
+          court_id: string | null
+          court_note: string | null
+          created_at: string
+          created_by: string
+          duration_min: number
+          forecast: Json | null
+          format: Database["public"]["Enums"]["game_format"]
+          id: string
+          kind: Database["public"]["Enums"]["game_kind"]
+          match_id: string | null
+          message: string | null
+          opponent_id: string
+          responded_at: string | null
+          starts_at: string
+          status: Database["public"]["Enums"]["game_status"]
+        }
+        Insert: {
+          balls_catalog_id?: string | null
+          balls_mode?: Database["public"]["Enums"]["balls_mode"]
+          court_id?: string | null
+          court_note?: string | null
+          created_at?: string
+          created_by: string
+          duration_min?: number
+          forecast?: Json | null
+          format?: Database["public"]["Enums"]["game_format"]
+          id?: string
+          kind?: Database["public"]["Enums"]["game_kind"]
+          match_id?: string | null
+          message?: string | null
+          opponent_id: string
+          responded_at?: string | null
+          starts_at: string
+          status?: Database["public"]["Enums"]["game_status"]
+        }
+        Update: {
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["game_status"]
+          match_id?: string | null
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          court_id: string | null
+          created_at: string
+          format: Database["public"]["Enums"]["game_format"]
+          id: string
+          kind: Database["public"]["Enums"]["game_kind"]
+          played_at: string
+          rated_at: string | null
+          reported_by: string
+          source: Database["public"]["Enums"]["match_source"]
+          status: Database["public"]["Enums"]["match_status"]
+          winner_id: string | null
+        }
+        Insert: { id?: string; played_at?: string; reported_by: string }
+        Update: { status?: Database["public"]["Enums"]["match_status"] }
+        Relationships: []
+      }
+      match_players: {
+        Row: { is_winner: boolean | null; match_id: string; profile_id: string; side: string }
+        Insert: { match_id: string; profile_id: string; side: string; is_winner?: boolean | null }
+        Update: { is_winner?: boolean | null }
+        Relationships: [
+          {
+            foreignKeyName: "match_players_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_sets: {
+        Row: {
+          games_a: number
+          games_b: number
+          match_id: string
+          set_no: number
+          tb_a: number | null
+          tb_b: number | null
+        }
+        Insert: { games_a: number; games_b: number; match_id: string; set_no: number }
+        Update: { games_a?: number; games_b?: number }
+        Relationships: [
+          {
+            foreignKeyName: "match_sets_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_confirms: {
+        Row: {
+          created_at: string
+          decision: Database["public"]["Enums"]["confirm_decision"]
+          match_id: string
+          note: string | null
+          profile_id: string
+        }
+        Insert: {
+          decision: Database["public"]["Enums"]["confirm_decision"]
+          match_id: string
+          note?: string | null
+          profile_id: string
+        }
+        Update: {
+          decision?: Database["public"]["Enums"]["confirm_decision"]
+          note?: string | null
+        }
+        Relationships: []
+      }
+      rating_events: {
+        Row: {
+          actual_share: number | null
+          created_at: string
+          delta: number
+          expected_share: number | null
+          id: string
+          k_factor: number | null
+          kind: Database["public"]["Enums"]["rating_event_kind"]
+          match_id: string | null
+          points_after: number
+          points_before: number
+          profile_id: string
+          weight: number | null
+        }
+        Insert: { profile_id: string; points_before: number; points_after: number; delta: number }
+        Update: { delta?: number }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -265,6 +403,27 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      forecast_game: {
+        Args: { p_opponent: string; p_kind?: Database["public"]["Enums"]["game_kind"] }
+        Returns: {
+          scenario: string
+          share: number
+          delta_self: number
+          delta_opponent: number
+        }[]
+      }
+      report_match: {
+        Args: {
+          p_opponent: string
+          p_sets: Json
+          p_kind?: Database["public"]["Enums"]["game_kind"]
+          p_format?: Database["public"]["Enums"]["game_format"]
+          p_court_id?: string | null
+          p_played_at?: string
+          p_game_id?: string | null
+        }
+        Returns: Database["public"]["Tables"]["matches"]["Row"]
+      }
       points_to_level: { Args: { p: number }; Returns: number }
       player_cities: {
         Args: Record<string, never>
@@ -310,9 +469,17 @@ export type Database = {
       }
     }
     Enums: {
+      balls_mode: "mine" | "yours" | "agreed" | "catalog"
+      confirm_decision: "confirmed" | "disputed"
       equipment_kind: "racquet" | "string" | "balls" | "shoes"
       external_rating_kind: "ntrp" | "utr" | "wtn"
+      game_format: "best_of_3" | "pro_set_9" | "single_set" | "best_of_5"
+      game_kind: "rated" | "friendly"
+      game_status: "invited" | "accepted" | "declined" | "cancelled" | "expired" | "played"
+      match_source: "casual" | "league" | "tournament"
+      match_status: "pending" | "confirmed" | "disputed" | "void"
       playing_hand: "right" | "left"
+      rating_event_kind: "match" | "tournament" | "recalculation" | "decay"
       rating_status: "seed" | "provisional" | "established" | "confirmed" | "dormant"
       seed_method: "questionnaire" | "anchor" | "external_rating" | "coach"
     }
@@ -331,3 +498,13 @@ export type SeedMethod = Database["public"]["Enums"]["seed_method"]
 export type PlayingHand = Database["public"]["Enums"]["playing_hand"]
 export type PlayerSearchResult = Database["public"]["Functions"]["search_players"]["Returns"][number]
 export type PlayerFilters = Database["public"]["Functions"]["search_players"]["Args"]
+export type Game = Database["public"]["Tables"]["games"]["Row"]
+export type GameInsert = Database["public"]["Tables"]["games"]["Insert"]
+export type Match = Database["public"]["Tables"]["matches"]["Row"]
+export type MatchSet = Database["public"]["Tables"]["match_sets"]["Row"]
+export type RatingEvent = Database["public"]["Tables"]["rating_events"]["Row"]
+export type GameKind = Database["public"]["Enums"]["game_kind"]
+export type GameFormat = Database["public"]["Enums"]["game_format"]
+export type GameStatus = Database["public"]["Enums"]["game_status"]
+export type BallsMode = Database["public"]["Enums"]["balls_mode"]
+export type ForecastRow = Database["public"]["Functions"]["forecast_game"]["Returns"][number]

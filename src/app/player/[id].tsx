@@ -1,9 +1,9 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Avatar, Card, LevelBadge, Text } from '@/components/ui';
+import { Avatar, Button, Card, LevelBadge, Text } from '@/components/ui';
 import { playerAge, usePlayer } from '@/features/players/queries';
 import { Colors, Spacing } from '@/theme/tokens';
 
@@ -13,6 +13,7 @@ import { Colors, Spacing } from '@/theme/tokens';
  */
 export default function PlayerScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data } = usePlayer(id);
 
@@ -43,6 +44,12 @@ export default function PlayerScreen() {
               {t(`ratingStatus.${profile.rating_status}`)}
             </Text>
           </View>
+
+          <Button
+            label={t('games.challenge')}
+            size="lg"
+            onPress={() => router.push(`/challenge/${id}`)}
+          />
 
           <Card style={styles.stats}>
             <Stat label={t('profile.points')} value={String(profile.points)} tone="gold" />

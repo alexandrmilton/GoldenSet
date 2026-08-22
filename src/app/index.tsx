@@ -99,6 +99,7 @@ export default function HomeScreen() {
         onSelect={(key) => {
           setTab(key);
           if (key === 'search') router.push('/players');
+          if (key === 'messages') router.push('/games');
         }}
         onCompose={() => setComposeOpen(true)}
       />

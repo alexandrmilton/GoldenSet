@@ -102,7 +102,11 @@ export default function PlayersScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <PlayerCard player={item} onPress={() => router.push(`/player/${item.id}`)} />
+            <PlayerCard
+              player={item}
+              onPress={() => router.push(`/player/${item.id}`)}
+              onChallenge={() => router.push(`/challenge/${item.id}`)}
+            />
           )}
           ListEmptyComponent={
             isLoading ? null : (

@@ -10,6 +10,7 @@ import { Colors, Radius, Spacing } from '@/theme/tokens';
 export type PlayerCardProps = {
   player: PlayerSearchResult;
   onPress: () => void;
+  onChallenge?: () => void;
 };
 
 /**
@@ -17,7 +18,7 @@ export type PlayerCardProps = {
  * profile: level and how trustworthy that level is, where they are, how old
  * they are, and what they play with.
  */
-export function PlayerCard({ player, onPress }: PlayerCardProps) {
+export function PlayerCard({ player, onPress, onChallenge }: PlayerCardProps) {
   const { t } = useTranslation();
   const age = playerAge(player.birth_year);
 
@@ -63,7 +64,15 @@ export function PlayerCard({ player, onPress }: PlayerCardProps) {
         <Text variant="numericSmall" tone="gold">
           {String(player.points)}
         </Text>
-        <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
+        {onChallenge ? (
+          <Pressable accessibilityRole="button" onPress={onChallenge} style={styles.challenge}>
+            <Text variant="label" tone="onClay">
+              {t('games.challenge')}
+            </Text>
+          </Pressable>
+        ) : (
+          <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
+        )}
       </View>
     </Pressable>
   );
@@ -84,5 +93,11 @@ const styles = StyleSheet.create({
   body: { flex: 1, gap: 2 },
   topLine: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   name: { flexShrink: 1 },
-  right: { alignItems: 'flex-end', gap: 2 },
+  right: { alignItems: 'flex-end', gap: Spacing.xs },
+  challenge: {
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.pill,
+    backgroundColor: Colors.clay[500],
+  },
 });

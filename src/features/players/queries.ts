@@ -94,3 +94,20 @@ export function playerAge(birthYear: number | null) {
   if (!birthYear) return null;
   return new Date().getFullYear() - birthYear;
 }
+
+/** Names and avatars for a set of ids — used to label games and matches. */
+export function useProfileLookup(ids: string[]) {
+  const key = [...new Set(ids)].sort();
+  return useQuery({
+    queryKey: ['profile-lookup', key],
+    enabled: key.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, level, rating_status, points')
+        .in('id', key);
+      if (error) throw error;
+      return new Map((data ?? []).map((row) => [row.id, row]));
+    },
+  });
+}
